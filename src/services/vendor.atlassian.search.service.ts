@@ -170,9 +170,6 @@ export async function searchCommits(
 		throw new Error('No Atlassian credentials available');
 	}
 
-	// Set useBitbucketAuth to true since we're calling the Bitbucket API
-	credentials.useBitbucketAuth = true;
-
 	// Create API path for Bitbucket commits
 	const path = `/2.0/repositories/${params.workspaceSlug}/${params.repoSlug}/commits${
 		queryParams.toString() ? '?' + queryParams.toString() : ''
@@ -257,9 +254,6 @@ export async function searchCode(
 	if (!credentials) {
 		throw new Error('No Atlassian credentials available');
 	}
-
-	// Set useBitbucketAuth to true since we're calling the Bitbucket API
-	credentials.useBitbucketAuth = true;
 
 	// Create API path for Bitbucket code search
 	const path = `/2.0/workspaces/${params.workspaceSlug}/search/code?${queryParams.toString()}`;
