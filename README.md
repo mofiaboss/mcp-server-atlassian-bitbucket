@@ -55,15 +55,9 @@ Generate a Bitbucket App Password (legacy method):
 ### 2. Try It Instantly
 
 ```bash
-# Set your credentials (choose one method)
-
-# Method 1: Scoped API Token (recommended - future-proof)
+# Set your credentials
 export ATLASSIAN_USER_EMAIL="your.email@company.com"
 export ATLASSIAN_API_TOKEN="your_scoped_api_token"  # Token starting with ATATT
-
-# OR Method 2: Legacy App Password (will be deprecated June 2026)
-export ATLASSIAN_BITBUCKET_USERNAME="your_username"
-export ATLASSIAN_BITBUCKET_APP_PASSWORD="your_app_password"
 
 # List your workspaces
 npx -y @aashari/mcp-server-atlassian-bitbucket ls-workspaces
@@ -81,7 +75,6 @@ npx -y @aashari/mcp-server-atlassian-bitbucket get-repo --workspace-slug your-wo
 
 Add this to your Claude configuration file (`~/.claude/claude_desktop_config.json`):
 
-**Option 1: Scoped API Token (recommended - future-proof)**
 ```json
 {
   "mcpServers": {
@@ -91,22 +84,6 @@ Add this to your Claude configuration file (`~/.claude/claude_desktop_config.jso
       "env": {
         "ATLASSIAN_USER_EMAIL": "your.email@company.com",
         "ATLASSIAN_API_TOKEN": "your_scoped_api_token"
-      }
-    }
-  }
-}
-```
-
-**Option 2: Legacy App Password (will be deprecated June 2026)**
-```json
-{
-  "mcpServers": {
-    "bitbucket": {
-      "command": "npx",
-      "args": ["-y", "@aashari/mcp-server-atlassian-bitbucket"],
-      "env": {
-        "ATLASSIAN_BITBUCKET_USERNAME": "your_username",
-        "ATLASSIAN_BITBUCKET_APP_PASSWORD": "your_app_password"
       }
     }
   }
@@ -129,26 +106,12 @@ Then configure your AI assistant to use the MCP server with STDIO transport.
 
 Create `~/.mcp/configs.json` for system-wide configuration:
 
-**Option 1: Scoped API Token (recommended - future-proof)**
 ```json
 {
   "bitbucket": {
     "environments": {
       "ATLASSIAN_USER_EMAIL": "your.email@company.com",
       "ATLASSIAN_API_TOKEN": "your_scoped_api_token",
-      "BITBUCKET_DEFAULT_WORKSPACE": "your_main_workspace"
-    }
-  }
-}
-```
-
-**Option 2: Legacy App Password (will be deprecated June 2026)**
-```json
-{
-  "bitbucket": {
-    "environments": {
-      "ATLASSIAN_BITBUCKET_USERNAME": "your_username",
-      "ATLASSIAN_BITBUCKET_APP_PASSWORD": "your_app_password",
       "BITBUCKET_DEFAULT_WORKSPACE": "your_main_workspace"
     }
   }

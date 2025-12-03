@@ -27,27 +27,14 @@ describe('Transport Utility', () => {
 				return; // Skip silently - no credentials available for testing
 			}
 
-			// Check if the credentials are for standard Atlassian or Bitbucket-specific
-			if (credentials.useBitbucketAuth) {
-				// Verify the Bitbucket-specific credentials
-				expect(credentials).toHaveProperty('bitbucketUsername');
-				expect(credentials).toHaveProperty('bitbucketAppPassword');
-				expect(credentials).toHaveProperty('useBitbucketAuth');
+			// Verify the API token credentials
+			expect(credentials).toHaveProperty('userEmail');
+			expect(credentials).toHaveProperty('apiToken');
 
-				// Verify the credentials are not empty
-				expect(credentials.bitbucketUsername).toBeTruthy();
-				expect(credentials.bitbucketAppPassword).toBeTruthy();
-				expect(credentials.useBitbucketAuth).toBe(true);
-			} else {
-				// Verify the standard Atlassian credentials
-				expect(credentials).toHaveProperty('userEmail');
-				expect(credentials).toHaveProperty('apiToken');
-
-				// Verify the credentials are not empty
-				expect(credentials.userEmail).toBeTruthy();
-				expect(credentials.apiToken).toBeTruthy();
-				// Note: siteName is optional for API tokens
-			}
+			// Verify the credentials are not empty
+			expect(credentials.userEmail).toBeTruthy();
+			expect(credentials.apiToken).toBeTruthy();
+			// Note: siteName is optional
 		});
 
 		it('should return null and log a warning when environment variables are missing', () => {
@@ -58,8 +45,6 @@ describe('Transport Utility', () => {
 			delete process.env.ATLASSIAN_SITE_NAME;
 			delete process.env.ATLASSIAN_USER_EMAIL;
 			delete process.env.ATLASSIAN_API_TOKEN;
-			delete process.env.ATLASSIAN_BITBUCKET_USERNAME;
-			delete process.env.ATLASSIAN_BITBUCKET_APP_PASSWORD;
 
 			// Force reload configuration
 			config.load();

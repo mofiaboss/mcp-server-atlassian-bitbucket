@@ -272,14 +272,11 @@ export function handleCliError(error: unknown): never {
 			'Tip: Make sure to set up your Atlassian credentials in the configuration file or environment variables:',
 		);
 		cliLines.push(
-			'- ATLASSIAN_SITE_NAME, ATLASSIAN_USER_EMAIL, and ATLASSIAN_API_TOKEN; or',
-		);
-		cliLines.push(
-			'- ATLASSIAN_BITBUCKET_USERNAME and ATLASSIAN_BITBUCKET_APP_PASSWORD',
+			'- ATLASSIAN_USER_EMAIL and ATLASSIAN_API_TOKEN',
 		);
 	} else if (mcpError.type === ErrorType.AUTH_INVALID) {
 		cliLines.push(
-			'Tip: Check that your Atlassian API token or app password is correct and has not expired.',
+			'Tip: Check that your Atlassian API token is correct and has not expired.',
 		);
 		cliLines.push(
 			'Also verify that the configured user has access to the requested resource.',

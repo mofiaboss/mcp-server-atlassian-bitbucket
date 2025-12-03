@@ -10,17 +10,12 @@ import {
 
 /**
  * Interface for Atlassian API credentials
+ * Uses API Token authentication only (app password auth is deprecated)
  */
 export interface AtlassianCredentials {
-	// Standard Atlassian credentials
 	siteName?: string;
 	userEmail?: string;
 	apiToken?: string;
-	// Bitbucket-specific credentials (alternative approach)
-	bitbucketUsername?: string;
-	bitbucketAppPassword?: string;
-	// Indicates which auth method to use
-	useBitbucketAuth?: boolean;
 }
 
 /**
@@ -54,35 +49,20 @@ export function getAtlassianCredentials(): AtlassianCredentials | null {
 	const userEmail = config.get('ATLASSIAN_USER_EMAIL');
 	const apiToken = config.get('ATLASSIAN_API_TOKEN');
 
-	// If standard credentials are available, use them
-	if (userEmail && apiToken) {
-		methodLogger.debug('Using standard Atlassian credentials');
-		return {
-			siteName,
-			userEmail,
-			apiToken,
-			useBitbucketAuth: false,
-		};
+	// Validate required credentials
+	if (!userEmail || !apiToken) {
+		methodLogger.warn(
+			'Missing Atlassian credentials. Please set ATLASSIAN_USER_EMAIL and ATLASSIAN_API_TOKEN environment variables.',
+		);
+		return null;
 	}
 
-	// If standard credentials are not available, try Bitbucket-specific credentials
-	const bitbucketUsername = config.get('ATLASSIAN_BITBUCKET_USERNAME');
-	const bitbucketAppPassword = config.get('ATLASSIAN_BITBUCKET_APP_PASSWORD');
-
-	if (bitbucketUsername && bitbucketAppPassword) {
-		methodLogger.debug('Using Bitbucket-specific credentials');
-		return {
-			bitbucketUsername,
-			bitbucketAppPassword,
-			useBitbucketAuth: true,
-		};
-	}
-
-	// If neither set of credentials is available, return null
-	methodLogger.warn(
-		'Missing Atlassian credentials. Please set either ATLASSIAN_SITE_NAME, ATLASSIAN_USER_EMAIL, and ATLASSIAN_API_TOKEN environment variables, or ATLASSIAN_BITBUCKET_USERNAME and ATLASSIAN_BITBUCKET_APP_PASSWORD for Bitbucket-specific auth.',
-	);
-	return null;
+	methodLogger.debug('Using Atlassian API token credentials');
+	return {
+		siteName,
+		userEmail,
+		apiToken,
+	};
 }
 
 /**
@@ -104,31 +84,13 @@ export async function fetchAtlassian<T>(
 
 	const baseUrl = 'https://api.bitbucket.org';
 
-	// Set up auth headers based on credential type
-	let authHeader: string;
-
-	if (credentials.useBitbucketAuth) {
-		// Bitbucket API uses a different auth format
-		if (
-			!credentials.bitbucketUsername ||
-			!credentials.bitbucketAppPassword
-		) {
-			throw createAuthInvalidError(
-				'Missing Bitbucket username or app password',
-			);
-		}
-		authHeader = `Basic ${Buffer.from(
-			`${credentials.bitbucketUsername}:${credentials.bitbucketAppPassword}`,
-		).toString('base64')}`;
-	} else {
-		// Standard Atlassian API (Jira, Confluence)
-		if (!credentials.userEmail || !credentials.apiToken) {
-			throw createAuthInvalidError('Missing Atlassian credentials');
-		}
-		authHeader = `Basic ${Buffer.from(
-			`${credentials.userEmail}:${credentials.apiToken}`,
-		).toString('base64')}`;
+	// Set up auth header using API token (email:token)
+	if (!credentials.userEmail || !credentials.apiToken) {
+		throw createAuthInvalidError('Missing Atlassian credentials (userEmail and apiToken required)');
 	}
+	const authHeader = `Basic ${Buffer.from(
+		`${credentials.userEmail}:${credentials.apiToken}`,
+	).toString('base64')}`;
 
 	// Ensure path starts with a slash
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
